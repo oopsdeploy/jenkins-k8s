@@ -1,0 +1,103 @@
+# Jenkins Helm Chart Values
+controller:
+  adminUser: "${jenkins_admin_user}"
+  adminPassword: "${jenkins_admin_password}"
+  
+  # Resource limits and requests
+  resources:
+    requests:
+      cpu: "1000m"
+      memory: "2Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+
+  # Jenkins URL
+  jenkinsUrl: "${jenkins_url}"
+  
+  # Service configuration
+  serviceType: ClusterIP
+  servicePort: 8080
+  targetPort: 8080
+  
+  # Ingress configuration (disabled for Docker Desktop)
+  ingress:
+    enabled: false
+  
+  # Install default plugins
+  installPlugins:
+    - kubernetes:4053.v2b_138b_6b_5c85
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:5.0.0
+    - configuration-as-code:1670.v564dc8b_982d0
+    - blueocean:1.27.4
+    - docker-workflow:563.vd5d2e5c4007f
+    - pipeline-stage-view:2.25
+    - build-timeout:1.30
+    - credentials-binding:523.vd859a_4b_122e6
+    - timestamper:1.25
+    - ws-cleanup:0.45
+    - ant:475.vf34069fef73c
+    - gradle:2.8.2
+    - workflow-support:865.v43e7c6f2ab_d3
+
+  # JCasC configuration
+  JCasC:
+    defaultConfig: true
+    configScripts:
+      welcome-message: |
+        jenkins:
+          systemMessage: "Welcome to Jenkins on Docker Desktop!\n\nThis Jenkins instance is running in Kubernetes."
+
+  # Service account
+  serviceAccount:
+    create: false
+    name: jenkins
+
+# Persistence configuration
+persistence:
+  enabled: true
+  existingClaim: jenkins-pvc
+  storageClass: "${storage_class}"
+  size: "${storage_size}"
+
+# Agent configuration for Kubernetes
+agent:
+  enabled: true
+  image: "jenkins/inbound-agent"
+  tag: "latest"
+  resources:
+    requests:
+      cpu: "512m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  
+  # Configure agents to run in the same namespace
+  namespace: jenkins
+  
+  # Agent pod template
+  podTemplates:
+    default: |
+      - name: default
+        label: default
+        containers:
+        - name: jnlp
+          image: jenkins/inbound-agent:latest
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "512m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+
+# Network policy (disabled for simplicity in Docker Desktop)
+networkPolicy:
+  enabled: false
+
+# RBAC
+rbac:
+  create: true
+  readSecrets: true

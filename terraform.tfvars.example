@@ -1,0 +1,18 @@
+# Example terraform.tfvars file
+# Copy this file to terraform.tfvars and customize the values
+
+# Jenkins configuration
+jenkins_namespace = "jenkins"
+jenkins_admin_user = "admin"
+jenkins_admin_password = "your-secure-password-here"
+jenkins_url = "http://localhost:8080"
+
+# Resource configuration
+jenkins_storage_size = "20Gi"
+jenkins_cpu_request = "1000m"
+jenkins_memory_request = "2Gi"
+jenkins_cpu_limit = "2000m"
+jenkins_memory_limit = "4Gi"
+
+# Helm chart version
+jenkins_chart_version = "4.12.1"
